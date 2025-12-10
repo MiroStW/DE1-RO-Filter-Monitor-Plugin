@@ -1,3 +1,13 @@
-total_volume 0
-filter_change_date ""
+display {Total water used: 23.86 L
+Filter last changed: 2025-10-24}
+display_filter {Filter last changed:
+2025-10-24}
+display_volume {Total water used:
+28.20 L}
+filter_change_date 2025-10-24
+filter_threshold_display 50.0
+filter_threshold_ml 50000.0
+notification_shown 0
+total_volume 28196.059855957028
 use_gallons 0
+

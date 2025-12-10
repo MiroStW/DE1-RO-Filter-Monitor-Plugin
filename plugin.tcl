@@ -18,27 +18,31 @@ namespace eval ::plugins::${plugin_name} {
 
         add_de1_text $page_name 1280 300 -text [translate "Water Tracker"] -font Helv_20_bold -width 1200 -fill "#444444" -anchor "center" -justify "center"
 
-        add_de1_variable $page_name 1280 600 -font global_font -width 800 -fill "#444444" -anchor "center" -textvariable {$::plugins::de1_water_tracker::settings(display)}
+        # Left column - Volume/Settings
+        add_de1_variable $page_name 680 500 -font global_font -width 600 -fill "#444444" -anchor "w" -textvariable {$::plugins::de1_water_tracker::settings(display_volume)}
 
-        dui add entry $page_name 1280 760 -tags filter_date -width 12 -font Helv_10 \
-            -borderwidth 1 -bg #fbfaff -foreground #4e85f4 -relief flat \
-            -highlightthickness 1 -highlightcolor #000000 \
-            -textvariable ::plugins::de1_water_tracker::settings(filter_change_date) \
-            -label [translate "Filter Last Changed Date"] -label_pos {1280 700} \
-            -label_font Helv_10_bold -label_width 1200 -label_fill "#444444" -label_anchor center
-
-        dui add dcheckbox $page_name 1280 890 -tags use_gallons -textvariable ::plugins::de1_water_tracker::settings(use_gallons) -fill "#444444" \
-            -label [translate "Display in gallons"] -label_font Helv_10_bold -label_fill #4e85f4 -command ::plugins::de1_water_tracker::toggle_units
-
-        dui add entry $page_name 1280 1010 -tags filter_threshold -width 12 -font Helv_10 \
+        dui add entry $page_name 680 740 -tags filter_threshold -width 12 -font Helv_10 \
             -borderwidth 1 -bg #fbfaff -foreground #4e85f4 -relief flat \
             -highlightthickness 1 -highlightcolor #000000 \
             -textvariable ::plugins::de1_water_tracker::settings(filter_threshold_display) \
-            -label [translate "Filter change reminder (L or gal)"] -label_pos {1280 950} \
-            -label_font Helv_10_bold -label_width 1200 -label_fill "#444444" -label_anchor center
+            -label [translate "Filter change reminder (L or gal)"] -label_pos {680 680} \
+            -label_font Helv_10_bold -label_width 1200 -label_fill "#444444" -label_anchor w
 
-        add_de1_text $page_name 1280 1150 -text [translate "Reset Counter"] -font Helv_10_bold -fill "#4e85f4" -anchor "center"
-        add_de1_button $page_name ::plugins::de1_water_tracker::reset_counter 980 1120 1580 1220 ""
+        dui add dcheckbox $page_name 680 820 -tags use_gallons -textvariable ::plugins::de1_water_tracker::settings(use_gallons) -fill "#444444" \
+            -label [translate "Display in gallons"] -label_font Helv_10_bold -label_fill #4e85f4 -command ::plugins::de1_water_tracker::toggle_units
+
+        # Right column - Filter/Actions
+        add_de1_variable $page_name 1480 500 -font global_font -width 600 -fill "#444444" -anchor "w" -textvariable {$::plugins::de1_water_tracker::settings(display_filter)}
+
+        dui add entry $page_name 1480 740 -tags filter_date -width 12 -font Helv_10 \
+            -borderwidth 1 -bg #fbfaff -foreground #4e85f4 -relief flat \
+            -highlightthickness 1 -highlightcolor #000000 \
+            -textvariable ::plugins::de1_water_tracker::settings(filter_change_date) \
+            -label [translate "Filter Last Changed Date"] -label_pos {1480 680} \
+            -label_font Helv_10_bold -label_width 1200 -label_fill "#444444" -label_anchor w
+
+        add_de1_text $page_name 1480 900 -text [translate "Reset Counter"] -font Helv_10_bold -fill "#4e85f4" -anchor "w"
+        add_de1_button $page_name ::plugins::de1_water_tracker::reset_counter 1480 870 1880 930 ""
 
         # Create custom filter warning page
         add_de1_page "water_filter_warning" "settings_message.png" "default"
@@ -87,7 +91,9 @@ namespace eval ::plugins::${plugin_name} {
             }
         }
         set settings(filter_change_date) [string trim $settings(filter_change_date)]
-        set settings(display) [format [translate "Total water used: %.2f %s\nFilter last changed: %s"] $value $units $date_text]
+        # Split display into two columns
+        set settings(display_volume) [format [translate "Total water used:\n%.2f %s"] $value $units]
+        set settings(display_filter) [format [translate "Filter last changed:\n%s"] $date_text]
     }
 
     proc update_threshold {} {
