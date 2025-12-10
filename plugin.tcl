@@ -1,48 +1,48 @@
-set plugin_name "de1_water_tracker"
+set plugin_name "ro_filter_monitor"
 
 namespace eval ::plugins::${plugin_name} {
     variable author "Sy_Butter"
     variable contact "Github"
     variable version 0.2
-    variable description "Track total water usage and get notified when it's time to change your filter."
-    variable name "Water Usage Tracker"
+    variable description "Monitor RO filter usage and get notified when it's time to change your filter."
+    variable name "RO Filter Monitor"
     variable settings
 
     proc build_ui {} {
         variable settings
-        set page_name "plugin_water_tracker_page_default"
+        set page_name "plugin_ro_filter_monitor_page_default"
 
         add_de1_page "$page_name" "settings_message.png" "default"
         add_de1_text $page_name 1280 1310 -text [translate "Done"] -font Helv_10_bold -fill "#fAfBff" -anchor "center"
-        add_de1_button $page_name {say [translate {Done}] $::settings(sound_button_in); ::plugins::de1_water_tracker::save_and_close} 980 1210 1580 1410 ""
+        add_de1_button $page_name {say [translate {Done}] $::settings(sound_button_in); ::plugins::ro_filter_monitor::save_and_close} 980 1210 1580 1410 ""
 
-        add_de1_text $page_name 1280 300 -text [translate "Water Tracker"] -font Helv_20_bold -width 1200 -fill "#444444" -anchor "center" -justify "center"
+        add_de1_text $page_name 1280 300 -text [translate "RO Filter Monitor"] -font Helv_20_bold -width 1200 -fill "#444444" -anchor "center" -justify "center"
 
         # Left column - Volume/Settings
-        add_de1_variable $page_name 680 500 -font global_font -width 600 -fill "#444444" -anchor "w" -textvariable {$::plugins::de1_water_tracker::settings(display_volume)}
+        add_de1_variable $page_name 680 500 -font global_font -width 600 -fill "#444444" -anchor "w" -textvariable {$::plugins::ro_filter_monitor::settings(display_volume)}
 
         dui add entry $page_name 680 740 -tags filter_threshold -width 12 -font Helv_10 \
             -borderwidth 1 -bg #fbfaff -foreground #4e85f4 -relief flat \
             -highlightthickness 1 -highlightcolor #000000 \
-            -textvariable ::plugins::de1_water_tracker::settings(filter_threshold_display) \
+            -textvariable ::plugins::ro_filter_monitor::settings(filter_threshold_display) \
             -label [translate "Filter change reminder (L or gal)"] -label_pos {680 680} \
             -label_font Helv_10_bold -label_width 1200 -label_fill "#444444" -label_anchor w
 
-        dui add dcheckbox $page_name 680 820 -tags use_gallons -textvariable ::plugins::de1_water_tracker::settings(use_gallons) -fill "#444444" \
-            -label [translate "Display in gallons"] -label_font Helv_10_bold -label_fill #4e85f4 -command ::plugins::de1_water_tracker::toggle_units
+        dui add dcheckbox $page_name 680 820 -tags use_gallons -textvariable ::plugins::ro_filter_monitor::settings(use_gallons) -fill "#444444" \
+            -label [translate "Display in gallons"] -label_font Helv_10_bold -label_fill #4e85f4 -command ::plugins::ro_filter_monitor::toggle_units
 
         # Right column - Filter/Actions
-        add_de1_variable $page_name 1480 500 -font global_font -width 600 -fill "#444444" -anchor "w" -textvariable {$::plugins::de1_water_tracker::settings(display_filter)}
+        add_de1_variable $page_name 1480 500 -font global_font -width 600 -fill "#444444" -anchor "w" -textvariable {$::plugins::ro_filter_monitor::settings(display_filter)}
 
         dui add entry $page_name 1480 740 -tags filter_date -width 12 -font Helv_10 \
             -borderwidth 1 -bg #fbfaff -foreground #4e85f4 -relief flat \
             -highlightthickness 1 -highlightcolor #000000 \
-            -textvariable ::plugins::de1_water_tracker::settings(filter_change_date) \
+            -textvariable ::plugins::ro_filter_monitor::settings(filter_change_date) \
             -label [translate "Filter Last Changed Date"] -label_pos {1480 680} \
             -label_font Helv_10_bold -label_width 1200 -label_fill "#444444" -label_anchor w
 
         add_de1_text $page_name 1480 900 -text [translate "Reset Counter"] -font Helv_10_bold -fill "#4e85f4" -anchor "w"
-        add_de1_button $page_name ::plugins::de1_water_tracker::reset_counter 1480 870 1880 930 ""
+        add_de1_button $page_name ::plugins::ro_filter_monitor::reset_counter 1480 870 1880 930 ""
 
         # Create custom filter warning page
         add_de1_page "water_filter_warning" "settings_message.png" "default"
@@ -118,7 +118,7 @@ namespace eval ::plugins::${plugin_name} {
                 set settings(notification_shown) 0
             }
 
-            save_plugin_settings de1_water_tracker
+            save_plugin_settings ro_filter_monitor
         }]} {
             # Invalid input, reset to current value
             update_display
@@ -135,7 +135,7 @@ namespace eval ::plugins::${plugin_name} {
         if {$settings(filter_threshold_ml) > 0 && !$settings(notification_shown)} {
             if {$settings(total_volume) >= $settings(filter_threshold_ml)} {
                 set settings(notification_shown) 1
-                save_plugin_settings de1_water_tracker
+                save_plugin_settings ro_filter_monitor
 
                 # Navigate to warning page instead of popup
                 set_next_page off water_filter_warning
@@ -149,7 +149,7 @@ namespace eval ::plugins::${plugin_name} {
         set settings(total_volume) 0
         set settings(filter_change_date) [clock format [clock seconds] -format "%Y-%m-%d"]
         set settings(notification_shown) 0
-        save_plugin_settings de1_water_tracker
+        save_plugin_settings ro_filter_monitor
         update_display
         popup [translate "Counter reset"]
     }
@@ -158,7 +158,7 @@ namespace eval ::plugins::${plugin_name} {
         variable settings
         # When toggling units, convert the threshold stored in ml to the new unit for display
         update_display
-        save_plugin_settings de1_water_tracker
+        save_plugin_settings ro_filter_monitor
     }
 
     proc save_and_close {} {
@@ -185,7 +185,7 @@ namespace eval ::plugins::${plugin_name} {
                 Descale -
                 AirPurge {
                     set settings(total_volume) [expr {$settings(total_volume) + $::de1(volume)}]
-                    save_plugin_settings de1_water_tracker
+                    save_plugin_settings ro_filter_monitor
                     update_display
                     check_threshold
                 }
@@ -222,8 +222,8 @@ namespace eval ::plugins::${plugin_name} {
             }
         }
         update_display
-        ::de1::event::listener::on_major_state_change_add ::plugins::de1_water_tracker::on_state_change
+        ::de1::event::listener::on_major_state_change_add ::plugins::ro_filter_monitor::on_state_change
 
-        plugins gui de1_water_tracker [build_ui]
+        plugins gui ro_filter_monitor [build_ui]
     }
 }
